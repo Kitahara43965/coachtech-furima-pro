@@ -37,6 +37,9 @@ MAIL_FROM_ADDRESS=noreply@example.com<br>
 STRIPE_KEY=pk_test_51SPiHEQSyg9ASGebyCSeAmwImMCKJhyH4KA67OM2Wqiabbs1H3TD86ExSygNgoT2fHMD1M9jHrF1VobzzeU4NMCu00NTU0mHr5<br>
 STRIPE_SECRET=sk_test_51SPiHEQSyg9ASGebSOYPhtVgeE0C68NJooGaV9fwasEKHSDa6WElqZqEk3lSQrIGmG9ziXbEM7J54yqZ6O1Lpd7s00CvLx32st<br>
 とします。<br>
+STRIPE_KEY=pk_test_51SPiHEQSyg9ASGebyCSeAmwImMCKJhyH4KA67OM2Wqiabbs1H3TD86ExSygNgoT2fHMD1M9jHrF1VobzzeU4NMCu00NTU0mHr5<br>
+STRIPE_SECRET=sk_test_51SPiHEQSyg9ASGebSOYPhtVgeE0C68NJooGaV9fwasEKHSDa6WElqZqEk3lSQrIGmG9ziXbEM7J54yqZ6O1Lpd7s00CvLx32st<br>
+は.env.testingに掲載します<br>
 (ハ-3) php コンテナ上で<br>
 $ php artisan key:generate<br>
 $ php artisan migrate:fresh {もしくは $ php artisan migrate}<br>
