@@ -6,8 +6,8 @@ Pro入会テスト_フリマアプリ
 (イ) ローカルリポジトリの設定<br>
 ローカルリポジトリを作成するディレクトリにおいてコマンドライン上で<br>
 $ git clone git@github.com:Kitahara43965/coachtechfurima-pro.git<br>
-$ mv coachtechfurima (ローカルリポジトリ名){OS:apple}<br>
-$ rename coachtechfurima (ローカルリポジトリ名){OS:windows,コマンドプロンプト}<br>
+$ mv coachtechfurima-pro (ローカルリポジトリ名){OS:apple}<br>
+$ rename coachtechfurima-pro (ローカルリポジトリ名){OS:windows,コマンドプロンプト}<br>
 とすればリモートリポジトリのクローンが生成され、所望のローカルリポジトリ名のディレクトリが得られます。<br>
 <br>
 (ロ) docker の設定<br>
@@ -120,7 +120,7 @@ mailhog v1.0.1<br>
 
 ## ER 図<br>
 
-<img width="1715" height="1041" alt="Image" src="https://github.com/user-attachments/assets/3e10b0d9-bb10-4aac-a1e2-c1ce1bcb0635" />
+<img width="1721" height="1751" alt="Image" src="https://github.com/user-attachments/assets/7ed6189a-ff68-474e-9412-8655e8186716" />
 
 ## URL
 
