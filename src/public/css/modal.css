@@ -1,0 +1,70 @@
+.rating-modal {
+    display: block; /* session があれば表示 */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.rating-modal-content {
+    background: #fff;
+    padding: 20px;
+    margin: 15% auto;
+    width: 400px;
+    height: 200px;
+    text-align: center;
+    border-radius: 8px;
+    background-color: yellow;
+}
+
+.edit-modal {
+    display: block; /* session があれば表示 */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: auto;
+    height: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.open-edit-button {
+    display: block;
+}
+
+.edit-modal-content {
+    background: #fff;
+    padding: 20px;
+    margin: 15% auto;
+    width: 300px;
+    text-align: center;
+    border-radius: 8px;
+}
+
+#edit-modal-id {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* 背景の色と透明度 */
+    display: none; /* デフォルトで非表示 */
+    justify-content: center;
+    align-items: center;
+    z-index: 50; /* 最前面 */
+}
+
+/* モーダルコンテンツ */
+#edit-modal-id > .modal-content {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 400px;
+}
+
+/* 開いたモーダル */
+#edit-modal-id.show {
+    display: flex; /* 表示時はflexに */
+}

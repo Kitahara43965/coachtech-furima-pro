@@ -1,0 +1,130 @@
+.deal-board {
+    width: 100%;
+}
+
+.deal-title-user-image-and-name {
+    display: flex;
+    justify-content: start;
+    text-align: left;
+}
+
+.deal-title-user-image-container {
+    width: 60px;
+    height: 60px;
+    margin: 5px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f9f9f9;
+}
+
+.deal-item-image-container {
+    width: 120px;
+    height: 120px;
+    margin: 5px;
+    border-radius: 0%;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f9f9f9;
+}
+
+.deal-title-user-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* ← ここがポイント */
+}
+
+.deal-title-user-name {
+    align-items: center;
+    margin: 0px;
+}
+
+.deal-left-user-image-and-name {
+    display: flex;
+    justify-content: start;
+    text-align: left;
+}
+
+.deal-right-user-image-and-name {
+    display: flex;
+    justify-content: end;
+    text-align: right;
+}
+
+.deal-user-image-container {
+    width: 60px;
+    height: 60px;
+    margin: 5px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f9f9f9;
+}
+
+.deal-user-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* ← ここがポイント */
+}
+
+.deal-user-name {
+    align-items: center;
+    margin: 20px;
+}
+
+.deal-left-published-textarea-container {
+    text-align: left;
+    display: flex;
+    justify-content: end;
+}
+
+.deal-right-published-textarea-container {
+    text-align: right;
+    display: flex;
+    justify-content: start;
+}
+
+.deal-left-published-textarea-container,
+.deal-right-published-textarea-container {
+    margin: 10px;
+}
+
+.deal-published-textarea {
+    margin: 20px 5px;
+    padding: 10px;
+    width: 300px;
+    height: auto;
+    min-height: 50px;
+    resize: vertical;
+}
+
+.deal-draft-textarea {
+    margin: 20px 5px;
+    padding: 10px;
+    width: 500px;
+    height: auto;
+    min-height: 50px;
+    resize: vertical;
+}
+
+.deal-comment-container {
+    width: 100%;
+    display: flex;
+    justify-content: end;
+    text-align: right;
+}
+
+.deal-comment-button {
+    padding: 0;
+    margin: 0;
+    background: none;
+    font-size: 14px;
+    line-height: 1;
+    display: inline-block;
+}
