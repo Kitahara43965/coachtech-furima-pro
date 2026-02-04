@@ -1,3 +1,7 @@
-*
-!public/
-!.gitignore
+*                      # すべてのファイルを無視
+!public/               # public フォルダは無視しない
+!public/**/*.jpg       # jpg 画像を無視しない
+!public/**/*.png       # png 画像を無視しない
+!public/**/*.jpeg      # jpeg 画像を無視しない
+!public/**/*.svg       # svg 画像を無視しない
+!.gitignore            # .gitignore ファイルは無視しない

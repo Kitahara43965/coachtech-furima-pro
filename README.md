@@ -5,9 +5,9 @@ Pro入会テスト_フリマアプリ
 
 (イ) ローカルリポジトリの設定<br>
 ローカルリポジトリを作成するディレクトリにおいてコマンドライン上で<br>
-$ git clone git@github.com:Kitahara43965/coachtechfurima-pro.git<br>
-$ mv coachtechfurima-pro (ローカルリポジトリ名){OS:apple}<br>
-$ rename coachtechfurima-pro (ローカルリポジトリ名){OS:windows,コマンドプロンプト}<br>
+$ git clone git@github.com:Kitahara43965/coachtech-furima-pro.git<br>
+$ mv coachtech-furima-pro (ローカルリポジトリ名){OS:apple}<br>
+$ rename coachtech-furima-pro (ローカルリポジトリ名){OS:windows,コマンドプロンプト}<br>
 とすればリモートリポジトリのクローンが生成され、所望のローカルリポジトリ名のディレクトリが得られます。<br>
 <br>
 (ロ) docker の設定<br>
@@ -39,7 +39,7 @@ STRIPE_SECRET=sk_test_51SPiHEQSyg9ASGebSOYPhtVgeE0C68NJooGaV9fwasEKHSDa6WElqZqEk
 とします。<br>
 STRIPE_KEY=pk_test_51SPiHEQSyg9ASGebyCSeAmwImMCKJhyH4KA67OM2Wqiabbs1H3TD86ExSygNgoT2fHMD1M9jHrF1VobzzeU4NMCu00NTU0mHr5<br>
 STRIPE_SECRET=sk_test_51SPiHEQSyg9ASGebSOYPhtVgeE0C68NJooGaV9fwasEKHSDa6WElqZqEk3lSQrIGmG9ziXbEM7J54yqZ6O1Lpd7s00CvLx32st<br>
-は.env.testingに掲載します<br>
+は.env.testingにも掲載します<br>
 (ハ-3) php コンテナ上で<br>
 $ php artisan key:generate<br>
 $ php artisan migrate:fresh {もしくは $ php artisan migrate}<br>
@@ -50,6 +50,14 @@ rm public/storage {既存のリンクを削除}<br>
 php artisan storage:link {再度リンクの作成}<br>
 をすることで web アプリを起動させることができます。<br>
 <br>
+## ダミーユーザー<br>
+(1) 名前：user1、メールアドレス：user1@mail.com 、パスワード：user1test<br>
+ユーザー名：山田 一郎、 郵便番号：123-4567、住所：北海道札幌市AAAA、建物名：Aハイツ<br>
+(2) 名前：user2、メールアドレス：user2@mail.com 、パスワード：user2test<br>
+ユーザー名：山田 仁子、 郵便番号：123-4567、住所：北海道札幌市AAAA、建物名：Aハイツ<br>
+(3) 名前：user3、メールアドレス：user3@mail.com、 パスワード：user3test<br>
+ユーザー名：山田 三郎、 郵便番号：123-4567、住所：北海道札幌市AAAA、建物名：Aハイツ<br>
+
 (二) メール認証について<br>
 (二-1) url入力欄に<br>
 localhost:8025<br>
@@ -101,14 +109,6 @@ $ vendor/bin/phpunit tests/Feature/RegisterTest.php<br>
 その他<br>
 初期化・シーディング・初期の画像保存テスト—InitialValueTest.php<br>
 プロファイルの登録完了テスト ー ProfileTest.php<br>
-
-## ダミーユーザー<br>
-(1) 名前：user1、メールアドレス：user1@mail.com 、パスワード：user1test<br>
-ユーザー名：山田 一郎、 郵便番号：123-4567、住所：北海道札幌市AAAA、建物名：Aハイツ<br>
-(2) 名前：user2、メールアドレス：user2@mail.com 、パスワード：user2test<br>
-ユーザー名：山田 仁子、 郵便番号：123-4567、住所：北海道札幌市AAAA、建物名：Aハイツ<br>
-(3) 名前：user3、メールアドレス：user3@mail.com、 パスワード：user3test<br>
-ユーザー名：山田 三郎、 郵便番号：123-4567、住所：北海道札幌市AAAA、建物名：Aハイツ<br>
 
 ## 使用技術(実行環境)<br>
 
