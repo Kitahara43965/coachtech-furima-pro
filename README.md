@@ -41,11 +41,11 @@ DB_USERNAME=laravel_user<br>
 DB_PASSWORD=laravel_pass<br>
 MAIL_FROM_ADDRESS=noreply@example.com<br>
 {以下の2項目追加}
-STRIPE_KEY=(手順(ハ)で得た「公開可能キー」)<br>
-STRIPE_SECRET=(手順(ハ)で得た「シークレットキー」)<br>
+STRIPE_KEY=(手順(ハ)で得たstripeの「公開可能キー」)<br>
+STRIPE_SECRET=(手順(ハ)で得たstripeの「シークレットキー」)<br>
 とします。<br>
-STRIPE_KEY=(手順(ハ)で得た「公開可能キー」)<br>
-STRIPE_SECRET=(手順(ハ)で得た「シークレットキー」)<br>
+STRIPE_KEY=(手順(ハ)で得たstripeの「公開可能キー」)<br>
+STRIPE_SECRET=(手順(ハ)で得たstripeの「シークレットキー」)<br>
 は.env.testingにも掲載します<br>
 (ニ-3) php コンテナ上で<br>
 $ php artisan key:generate<br>
