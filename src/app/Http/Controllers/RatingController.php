@@ -52,7 +52,7 @@ class RatingController extends Controller
         }//$type
     }
 
-    public function completeAfterRating($fromUserId,$itemId)
+    public function completeAfterRatingFromItemIdAndUserId($itemId,$fromUserId)
     {
         $item = Item::find($itemId);
         $itemBuyer = $item ? $item->buyer() : null;
@@ -84,9 +84,6 @@ class RatingController extends Controller
             if($fromUserItemPivot&&$fromUser){
                 // 購入者側
                 if ($fromUserId === $itemBuyerId) {
-                    if($fromUserItemPivot->is_buyer_completed === false){
-                        Mail::to($itemSeller->email)->send(new TransactionCompletedMail($item, $itemBuyer));
-                    }//$fromUserItemPivot->is_buyer_completed
                     $fromUserItemPivot->is_buyer_completed = true;
                 }
                 // 出品者側
@@ -95,17 +92,19 @@ class RatingController extends Controller
                 }
                 // 両方完了したら取引完了
                 if ($fromUserItemPivot->is_buyer_completed && $fromUserItemPivot->is_seller_completed) {
+                    Mail::to($itemSeller->email)->send(new TransactionCompletedMail($item, $itemSeller));
                     $fromUserItemPivot->status = UserItemStatus::COMPLETED;
                     $fromUserItemPivot->completed_at = now();
                 }
                 $fromUserItemPivot->save();
             }//$fromUserItemPivot
         });
-    }//completeAfterRating
+    }//completeAfterRatingFromItemIdAndUserId
 
     public function ratingStoreItemId(RatingRequest $request,$item_id){
 
-        $ratingValue = $request->rating_value;
+        $originalRatingValue = $request->rating_value;
+        $ratingValue = $originalRatingValue ? $originalRatingValue : 0;
         $itemId = (int)$item_id;
 
         $authUser = Auth::user();
@@ -114,9 +113,9 @@ class RatingController extends Controller
             $authUserId = $authUser->id;
         }//$authUser
 
-        $ratingDTO = RatingService::getRatingDTOFromUserIdAndItemId($authUserId,$itemId);
+        $ratingDTO = RatingService::getRatingDTOFromItemIdAndUserId($itemId,$authUserId);
         self::updateRatingFromRatingDTO($ratingDTO,$ratingValue);
-        self::completeAfterRating($authUserId,$itemId);
+        self::completeAfterRatingFromItemIdAndUserId($itemId,$authUserId);
 
         $returnedRoute = route("index");
         return redirect($returnedRoute)->with("ratingBarStore","success");

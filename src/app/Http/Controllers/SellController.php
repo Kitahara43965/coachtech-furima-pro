@@ -9,8 +9,10 @@ use App\Models\Condition;
 use App\Models\PurchaseMethod;
 use App\Http\Requests\SellRequest;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\BaseController;
+use App\Http\Controllers\ImageFileNumberController;
+use App\Constants\Files\FileName;
 use Illuminate\Support\Facades\DB;
+use App\Services\ImageFileNumberCountService;
 
 class SellController
 {
@@ -18,8 +20,7 @@ class SellController
 
     public function countImages()
     {
-        $baseController = new BaseController;
-        $count = $baseController->getPublicImageNumber(BaseController::ITEM_IMAGE_DIRECTORY,BaseController::ITEM_IMAGE_PREFIX);
+        $count = ImageFileNumberCountService::getPublicImageNumber(FileName::ITEM_IMAGE_DIRECTORY,FileName::ITEM_IMAGE_PREFIX);
         return response()->json(['count' => $count]);
     }
 
@@ -29,7 +30,6 @@ class SellController
         $sellType = $request->input('sellType','');
         
 
-        $baseController = new BaseController;
         $authenticatedUser = Auth::user();
         $previewUrl = null;
         $imageName = null;
@@ -56,11 +56,11 @@ class SellController
                 $originalImageName = $file->getClientOriginalName();
                 $extension = pathinfo($originalImageName, PATHINFO_EXTENSION);
 
-                $count = $baseController->getPublicImageNumber(BaseController::ITEM_IMAGE_DIRECTORY,BaseController::ITEM_IMAGE_PREFIX);
-                $imageName = BaseController::ITEM_IMAGE_PREFIX . ($count + 1) . '.' . $extension;
+                $count = ImageFileNumberCountService::getPublicImageNumber(FileName::ITEM_IMAGE_DIRECTORY,FileName::ITEM_IMAGE_PREFIX);
+                $imageName = FileName::ITEM_IMAGE_PREFIX . ($count + 1) . '.' . $extension;
 
                 // 保存
-                $path = $file->storeAs(BaseController::ITEM_IMAGE_DIRECTORY, $imageName, 'public');
+                $path = $file->storeAs(FileName::ITEM_IMAGE_DIRECTORY, $imageName, 'public');
                 $previewUrl = asset('storage/'.$path);
             } else {
                 $imageName = $request->input('image_name');

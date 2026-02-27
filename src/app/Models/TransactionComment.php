@@ -4,13 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Constants\PreviewErrorStatus;
 
 class TransactionComment extends Model
 {
     use HasFactory;
 
     protected $table = 'transaction_comments';
-    protected $fillable = ['user_item_id','user_id','comment','status'];
+    protected $fillable = [
+        'user_item_id',
+        'user_id',
+        'is_watched',
+        'status',
+        'comment'
+    ];
 
     public function userItem()
     {
@@ -26,4 +33,6 @@ class TransactionComment extends Model
     {
         return $this->hasMany(TransactionImage::class);
     }
+
+    
 }

@@ -21,11 +21,18 @@ $ docker-compose exec php bash<br>
 $ composer install<br>
 で composer をインストールします。<br>
 <br>
-(ハ) web アプリの立ち上げ<br>
-(ハ-1) php コンテナ上で<br>
+(ハ) stripeのキー取得（stripeキー取得済みの場合は(ニ)に進んでください。）<br>
+(ハ-1) stripeのダッシュボード<br>
+https://stripe.com/jp<br>
+に入り、「はじめる」をクリック<br>
+(ハ-2) 設定(歯車アイコン)に入り、開発者をクリック。
+(ハ-3) 「APIキーの管理」をクリックし、「公開可能キー」と「シークレットキー」を取得。
+<br>
+(ニ) web アプリの立ち上げ<br>
+(ニ-1) php コンテナ上で<br>
 $ cp .env.example .env<br>
 と入力し、.env ファイルを複製します。<br>
-(ハ-2) .env ファイルで<br>
+(ニ-2) .env ファイルで<br>
 APP_LOCALE=ja {追加}<br>
 DB_HOST=mysql<br>
 DB_PORT=3306<br>
@@ -34,13 +41,13 @@ DB_USERNAME=laravel_user<br>
 DB_PASSWORD=laravel_pass<br>
 MAIL_FROM_ADDRESS=noreply@example.com<br>
 {以下の2項目追加}
-STRIPE_KEY=pk_test_51SPiHEQSyg9ASGebyCSeAmwImMCKJhyH4KA67OM2Wqiabbs1H3TD86ExSygNgoT2fHMD1M9jHrF1VobzzeU4NMCu00NTU0mHr5<br>
-STRIPE_SECRET=sk_test_51SPiHEQSyg9ASGebSOYPhtVgeE0C68NJooGaV9fwasEKHSDa6WElqZqEk3lSQrIGmG9ziXbEM7J54yqZ6O1Lpd7s00CvLx32st<br>
+STRIPE_KEY=(手順(ハ)で得た「公開可能キー」)<br>
+STRIPE_SECRET=(手順(ハ)で得た「シークレットキー」)<br>
 とします。<br>
-STRIPE_KEY=pk_test_51SPiHEQSyg9ASGebyCSeAmwImMCKJhyH4KA67OM2Wqiabbs1H3TD86ExSygNgoT2fHMD1M9jHrF1VobzzeU4NMCu00NTU0mHr5<br>
-STRIPE_SECRET=sk_test_51SPiHEQSyg9ASGebSOYPhtVgeE0C68NJooGaV9fwasEKHSDa6WElqZqEk3lSQrIGmG9ziXbEM7J54yqZ6O1Lpd7s00CvLx32st<br>
+STRIPE_KEY=(手順(ハ)で得た「公開可能キー」)<br>
+STRIPE_SECRET=(手順(ハ)で得た「シークレットキー」)<br>
 は.env.testingにも掲載します<br>
-(ハ-3) php コンテナ上で<br>
+(ニ-3) php コンテナ上で<br>
 $ php artisan key:generate<br>
 $ php artisan migrate:fresh {もしくは $ php artisan migrate}<br>
 $ php artisan db:seed<br>
@@ -58,19 +65,19 @@ php artisan storage:link {再度リンクの作成}<br>
 (3) 名前：user3、メールアドレス：user3@mail.com、 パスワード：user3test<br>
 ユーザー名：山田 三郎、 郵便番号：123-4567、住所：北海道札幌市AAAA、建物名：Aハイツ<br>
 
-(二) メール認証について<br>
-(二-1) url入力欄に<br>
+(ホ) メール認証について<br>
+(ホ-1) url入力欄に<br>
 localhost:8025<br>
 を入力するとmailhogに接続されます。<br>
-(二-2) アプリでログアウトをせずに最新の届いたメールでメール認証をするとウェブアプリ「coachtechフリマ」に戻ります。<br>
+(ホ-2) アプリでログアウトをせずに最新の届いたメールでメール認証をするとウェブアプリ「coachtechフリマ」に戻ります。<br>
 (メールに接続しない場合は「認証はこちらから」ボタンを押下すると、認証が完了します)<br>
 <br>
-(ホ) stripe決済画面について<br>
-(ホ-1) インターネットを接続します。<br>
-(ホ-2) 「コンビニ払い」を選択<br>
+(へ) stripe決済画面について<br>
+(へ-1) インターネットを接続します。<br>
+(へ-2) 「コンビニ払い」を選択<br>
 stripe決済画面に情報を入力せず、画面左上にある「←」(カーソルをおいたときは「←戻る」になる)を押します。商品一覧画面に戻ります<br>
 stripe決済画面に情報を入力して進んだとき等はurl入力欄に「localhost」と入れれば商品一覧画面に戻ります<br>
-(ホ-3) 「カード支払い」を選択<br>
+(へ-3) 「カード支払い」を選択<br>
 stripe決済画面に移動からは以下の通り入力します。<br>
 メールアドレス:xxxxxx@gmail.com<br>
 支払い方法:424242424242424242<br>
@@ -83,7 +90,7 @@ MM(月)/YY(年):1234<br>
 
 
 テストについて<br>
-(へ) php コンテナ上で<br>
+(ト) php コンテナ上で<br>
 $ docker-compose exec php bash<br>
 $ vendor/bin/phpunit tests/Feature/(テスト用phpファイル名)<br>
 と入力。例えば<br>
@@ -120,7 +127,7 @@ mailhog v1.0.1<br>
 
 ## ER 図<br>
 
-<img width="1721" height="1751" alt="Image" src="https://github.com/user-attachments/assets/7ed6189a-ff68-474e-9412-8655e8186716" />
+<img width="1722" height="1752" alt="Image" src="https://github.com/user-attachments/assets/c1e2c15e-f09e-41dc-bd40-0e42900636cc" />
 
 ## URL
 

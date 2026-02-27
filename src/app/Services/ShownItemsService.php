@@ -5,15 +5,18 @@ namespace App\Services;
 use App\Constants\ShownItemsKind;
 use App\Models\User;
 use App\Models\Item;
+use Illuminate\Support\Facades\DB;
+use App\Services\TradingItemsService;
 
 class ShownItemsService{
     public static function getShownItems($user,$keyword,$shownItemsKind){
 
-        $shownItemsQuery = null;
-        $shownItems = null;
+        $query = null;
+        $shownItems = Item::query()->getModel()->newCollection();
+        $userId = $user? $user->id : null;
 
         if ($shownItemsKind == ShownItemsKind::OTHER_USERS_GOODS) {
-            $shownItemsQuery = Item::with([
+            $query = Item::with([
                 'condition',
                 'categories',
                 'favoritedByUsers',
@@ -21,38 +24,50 @@ class ShownItemsService{
                 'comments.user',
             ]);
             if ($user) {
-                $shownItemsQuery = $shownItemsQuery->where(function ($shownItemsQuery) use ($user) {
-                    $shownItemsQuery->whereHas('usersByOwnership', function ($q) use ($user) {
-                        $q->where('user_id', '!=', $user->id);
+                $query = $query->where(function ($q) use ($user) {
+                    $q->whereHas('usersByOwnership', function ($q2) use ($user) {
+                        $q2->where('user_id', '!=', $user->id);
                     })
                     ->orDoesntHave('usersByOwnership');
                 });
             }
+            if (!empty($keyword)) {
+                $query->where('name', 'like', '%' . $keyword . '%');
+            }
+            $shownItems = $query->get();
+
         }else if ($shownItemsKind == ShownItemsKind::FAVORITE_GOODS) {
             if ($user) {
-                $shownItemsQuery = $user->favoriteItems();
+                $query = $user->favoriteItems();
             }
+            if (!empty($keyword)) {
+                $query->where('name', 'like', '%' . $keyword . '%');
+            }
+            $shownItems = $query->get();
         }else if ($shownItemsKind == ShownItemsKind::SOLD_GOODS) {
             if ($user) {
-                $shownItemsQuery = $user->ownedItems();
+                $query = $user->ownedItems();
             }
+            if (!empty($keyword)) {
+                $query->where('name', 'like', '%' . $keyword . '%');
+            }
+            $shownItems = $query->get();
         }else if ($shownItemsKind == ShownItemsKind::BOUGHT_GOODS) {
             if ($user) {
-                $shownItemsQuery = $user->purchasedAndCompletedItems();
+                $query = $user->purchasedAndCompletedItems();
             }
-        }else if ($shownItemsKind == ShownItemsKind::DEAL_GOODS) {
-            if ($user) {
-                $shownItemsQuery = $user->tradingItems();
-            }
-        }//$indexKind
-
-        
-        if($shownItemsQuery){
             if (!empty($keyword)) {
-                $shownItemsQuery->where('name', 'like', '%' . $keyword . '%');
+                $query->where('name', 'like', '%' . $keyword . '%');
             }
-            $shownItems = $shownItemsQuery->get();
-        }//$shownItemsQuery
+            $shownItems = $query->get();
+        }else if ($shownItemsKind == ShownItemsKind::DEAL_GOODS) {
+            
+            $shownItems = TradingItemsService::getTradingItemsCollectionFromUserIdAndKeyword(
+                $userId,
+                $keyword
+            );
+
+        }//$indexKind
         
         return($shownItems);
     }

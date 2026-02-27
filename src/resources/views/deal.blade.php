@@ -4,241 +4,235 @@
 @section('css')
     <link rel="stylesheet" href="{{ asset('css/deal.css') }}">
     <link rel="stylesheet" href="{{ asset('css/rating.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/modal.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/preview.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/rating-modal.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/transaction.css') }}">
 @endsection
 
-<div class="deal-board">
-    @section('content')
-        @php
-            $stringOpenRatingModalDisabled = null;
-            if($authUserId === $selectedItemSellerId){
-                if($selectedItemHasBuyerRated === true){
+
+@section('content')
+
+    <div class="deal-board">
+        <div class="deal-other-items">
+            <h2 class="deal-other-items-title">その他の取引</h2>
+            @if($tradingItems)
+                @foreach($tradingItems as $index => $tradingItem)
+                    @php
+                        $maxNotifiedTransactionCommentNumber = $maxNotifiedTransactionCommentNumbers[$index];
+                    @endphp
+                    @if($tradingItem&&$selectedItem)
+                        @if($tradingItem->id !== $selectedItem->id)
+                            <div class="deal-other-items-button-container">
+                                @if($maxNotifiedTransactionCommentNumber >= 1)
+                                    <div class="deal-other-items-notified-transaction-comment-number">
+                                        {{$maxNotifiedTransactionCommentNumber}}
+                                    </div>
+                                @endif
+                                <a href="{{ route('item.deal.itemId', ['item_id' => $tradingItem->id]) }}" class="deal-other-items-button">{{$tradingItem->name}}</a>
+                            </div>
+                        @endif
+                    @endif
+                @endforeach
+            @endif
+        </div>
+        <div class="deal-transaction-cell-container">
+
+            @php
+                $buttonDisabledMarker = 0;
+                $ratingModalOpenButtonClass = "rating-modal-open-button";
+                $stringOpenRatingModalDisabled = null;
+                if($authUserId === $selectedItemSellerId){
+                    $buttonDisabledMarker = 1;
+                }//$authUserId
+
+                if($buttonDisabledMarker === 0){
                     $stringOpenRatingModalDisabled = "";
-                }else{//$selectedItemHasBuyerRated
+                    $disableAppendingClass = "";
+                }else{//$buttonDisabledMarker
                     $stringOpenRatingModalDisabled = " disabled";
-                }//$selectedItemHasBuyerRated
-            }else{//$authUserId
-                $stringOpenRatingModalDisabled = "";
-            }//$authUserId
+                    $disableAppendingClass = " disabled";
+                }//$buttonDisabledMarker
 
-            $draftTransactionCommentComment = $draftTransactionComment?->comment;
 
-            $counterpartUserImageName = $counterpartUser->image;
-            $counterpartUserName = $counterpartUser->name;
-            $newImageName = null;
-            $newPreviewUrl = null;
-            if($counterpartUserImageName){
-                $newImageName = $counterpartUserImageName;
-                $newPreviewUrl = asset('storage/'.$userImageDirectory.'/'.$newImageName);
-            }//$counterpartUserImageName
+                $draftTransactionCommentComment = $draftTransactionComment?->comment;
 
-            $itemImageName = $selectedItem->image;
-            $itemName = $selectedItem->name;
-            $itemPrice = $selectedItem->price;
-            $newItemImageName = null;
-            $newItemPreviewUrl = null;
-            if($itemImageName){
-                $newItemImageName = $itemImageName;
-                if($selectedItem->is_default){
-                    $newItemPreviewUrl = asset('storage/'.$coachtechImageDirectory.'/'.$newItemImageName);
-                }else{
-                    $newItemPreviewUrl = asset('storage/'.$itemImageDirectory.'/'.$newItemImageName);
-                }
-            }//$itemImageName
+                $counterpartUserImageName = $counterpartUser->image;
+                $counterpartUserUserName = $counterpartUser->username;
+                $newImageName = null;
+                $newPreviewUrl = null;
+                if($counterpartUserImageName){
+                    $newImageName = $counterpartUserImageName;
+                    $newPreviewUrl = asset('storage/'.$userImageDirectory.'/'.$newImageName);
+                }//$counterpartUserImageName
 
-        @endphp
+                $itemImageName = $selectedItem->image;
+                $itemName = $selectedItem->name;
+                $itemPrice = $selectedItem->price;
+                $newItemImageName = null;
+                $newItemPreviewUrl = null;
+                if($itemImageName){
+                    $newItemImageName = $itemImageName;
+                    if($selectedItem->is_default){
+                        $newItemPreviewUrl = asset('storage/'.$coachtechImageDirectory.'/'.$newItemImageName);
+                    }else{
+                        $newItemPreviewUrl = asset('storage/'.$itemImageDirectory.'/'.$newItemImageName);
+                    }
+                }//$itemImageName
 
-    <h1>取引画面</h1>
+            @endphp
 
-    <div class="deal-title-user-image-and-name">
-        <div class="deal-title-user-image-container">
-            <img id="preview"
-                src="{{$newPreviewUrl ?? $defaultProfilePreviewUrl}}"
-                class="deal-title-user-image">
-        </div>
-        <h1 class="deal-title-user-name">「{{$counterpartUserName}}」さんとの取引画面</h1>
-    </div>
+            <div class="user-image-and-rating-modal-open-button-container">
+                <div class="deal-title-user-image-and-name">
+                    <div class="deal-title-user-image-container">
+                        <img id="preview"
+                            src="{{$newPreviewUrl ?? $defaultProfilePreviewUrl}}"
+                            class="deal-title-user-image">
+                    </div>
+                    <h2 class="deal-title-user-name">「{{$counterpartUserUserName}}」さんとの取引画面</h2>
+                </div>
 
-    <button id="{{$openRatingModalButtonId}}" {{$stringOpenRatingModalDisabled}}>取引を完了する</button>
+                <button id="{{$ratingModalOpenButtonId}}" 
+                        class="{{$ratingModalOpenButtonClass.$disableAppendingClass}}" 
+                        {{$stringOpenRatingModalDisabled}}>取引を完了する</button>
+            </div>
 
-    <div class="deal-title-user-image-and-name">
-        <div class="deal-item-image-container">
-            <img id="preview"
-                src="{{$newItemPreviewUrl ?? ''}}"
-                class="deal-title-user-image">
-        </div>
-        <div>
-            <div class="deal-title-user-name">{{$itemName}}</div>
-            <div class="deal-title-user-name">¥{{$itemPrice}}</div>
-        </div>
-    </div>
+            <form method="POST" action="{{ route('ratingStore.itemId',['item_id'=>$selectedItemId]) }}">
+                @csrf
+            <!-- モーダル -->
+                <div id="{{$ratingModalId}}" class="rating-modal" style="display:none;">
+                    <div class="rating-modal-content">
+                        <div class="rating-modal-title">取引が完了しました。</div>
+                        <div class="rating-modal-horizontal-line"></div>
+                        <div class="rating-modal-question">今回の取引相手はどうでしたか?</div>
+                        <div class="rating">
+                            @for ($i = 5; $i >= 1; $i--)
+                                <input 
+                                    type="radio" 
+                                    id="star{{ $i }}" 
+                                    name="rating_value" 
+                                    value="{{ $i }}"
+                                    {{ $selectedItemRatingRatingValue == $i ? 'checked' : '' }}
+                                >
+                                <label for="star{{ $i }}" class="rating-star">★</label>
+                            @endfor
+                        </div>
+                        <div class="rating-modal-horizontal-line"></div>
+                        <div>
+                            <div class="rating-modal-submit-button-container">
+                                <button type="submit" class="rating-modal-submit-button">送信する</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-    <form method="POST" action="{{ route('ratingStore.itemId',['item_id'=>$selectedItemId]) }}">
-        @csrf
-    <!-- モーダル -->
-        <div id="{{$ratingModalId}}" class="{{$ratingModalClass}}" style="display:none;">
-            <div class="{{$ratingModalContentClass}}">
-                <h2>取引が完了しました。</h2>
-                <div>今回の取引相手はどうでしたか?</div>
+                <div class="form__error">
+                    @error('rating_value')
+                        {{ $message }}
+                    @enderror
+                </div>
+            </form>
 
-                <div class="rating">
-                    @for ($i = 5; $i >= 1; $i--)
-                        <input 
-                            type="radio" 
-                            id="star{{ $i }}" 
-                            name="rating_value" 
-                            value="{{ $i }}"
-                            {{ $selectedItemRatingRatingValue == $i ? 'checked' : '' }}
-                        >
-                        <label for="star{{ $i }}">★</label>
-                    @endfor
+            <div class="deal-horizontal-line"></div>
+
+            <div class="deal-title-item-image">
+                <div class="deal-item-image-container">
+                    <img id="preview"
+                        src="{{$newItemPreviewUrl ?? ''}}"
+                        class="deal-title-user-image">
                 </div>
                 <div>
-                    <button type="submit">送信する</button>
+                    <h1 class="deal-title-item-name">{{$itemName}}</h1>
+                    <div class="deal-title-item-price">¥{{$itemPrice}}</div>
                 </div>
             </div>
+
+            <div class="deal-horizontal-line"></div>
+
+            
+
+            <div id="{{$transactionCellContainerId}}" class="{{$transactionCellContainerClass}}"></div>
         </div>
-
-        <div class="form__error">
-            @error('rating_value')
-                {{ $message }}
-            @enderror
-        </div>
-    </form>
-
-
-    <form method="POST" action="{{ route('transactionCommentSend.itemId',['item_id'=>$selectedItemId]) }}">
-        @csrf
-
-        @if($publishedTransactionComments)
-            @foreach($publishedTransactionComments as $publishedTransactionComment)
-                @php
-                    $publishedTransactionCommentId = $publishedTransactionComment?->id;
-                    $publishedTransactionCommentComment = $publishedTransactionComment?->comment;
-                    $publishedTransactionCommentUser = $publishedTransactionComment?->user;
-                    $publishedTransactionCommentUserId = $publishedTransactionCommentUser?->id;
-                    $publishedTransactionCommentUserImageName = $publishedTransactionCommentUser->image;
-                    $publishedTransactionCommentUserName = $publishedTransactionCommentUser->name;
-                    $newImageName = null;
-                    $newPreviewUrl = null;
-                    if($publishedTransactionCommentUserImageName){
-                       $newImageName = $publishedTransactionCommentUserImageName;
-                       $newPreviewUrl = asset('storage/'.$userImageDirectory.'/'.$newImageName);
-                    }//$publishedTransactionCommentUserImageName
-
-                @endphp
-                @if($publishedTransactionCommentUserId === $authUserId)
-                    <div class = "deal-right-published-textarea-container">
-                @else
-                    <div class = "deal-left-published-textarea-container">
-                @endif
-                    <div>
-                        @if($publishedTransactionCommentUserId === $authUserId)
-                            <div class="deal-left-user-image-and-name">
-                        @else
-                            <div class="deal-right-user-image-and-name">
-                                <div class="deal-user-name">{{$publishedTransactionCommentUserName}}</div>
-                        @endif
-                                <div class="deal-user-image-container">
-                                    <img id="preview"
-                                        src="{{$newPreviewUrl ?? $defaultProfilePreviewUrl}}"
-                                        class="deal-user-image">
-                                </div>
-                        @if($publishedTransactionCommentUserId === $authUserId)
-                                <div class="deal-user-name">{{$publishedTransactionCommentUserName}}</div>
-                            </div>
-                        @else
-                            </div>
-                        @endif
-
-                        <textarea id="{{$prefixPublishedTransactionCommentId.$publishedTransactionCommentId}}"
-                            class = "deal-published-textarea"
-                            disabled>{{$publishedTransactionCommentComment}}</textarea>
-                    </div>
-                </div>
-
-                
-                <!--
-                    <div>
-                        <button type="button" 
-                                class="{{$openEditButtonClass}}"
-                                data-transaction-id="{{$publishedTransactionCommentId}}"
-                                data-message="{{$publishedTransactionCommentComment}}"
-                        >編集</button>
-                        <button type="button">削除</button>
-                    </div>
-                -->
-            @endforeach
-        @endif
-
-        <div class="deal-comment-container">
-                <textarea 
-                    name="{{$transactionCommentName}}" 
-                    placeholder="取引メッセージを入力してください"
-                    class="deal-draft-textarea"
-                >{{$draftTransactionCommentComment}}</textarea>
-
-                <button type="submit" class="deal-comment-button">コメント</button>
-                <div id="{{$previewGridId}}" class="{{$previewGridClass}}"></div>
-        </div>
-        <div class="deal-comment-container">
-            <div class="form__error">
-                @error($transactionCommentName)
-                    {{ $message }}
-                @enderror
-            </div>
-        </div>
-         
-
-    </form>
-</div>
-
-<!-- 編集モーダル -->
-<!-- <div id="{{$editModalId}}" class="fixed inset-0 hidden">
-  <div class="modal-content">
-    <h2 class="text-xl font-bold mb-4">コメント編集</h2>
-    <form id="editForm" action="{{route('commentEditItemId',['item_id'=>$selectedItemId])}}" method="POST">
-      @csrf
-      <input type="hidden" id="{{$editModalCommentId}}" name="transaction_comment_id">
-      <textarea name="message" id="{{$editModalMessageId}}"></textarea>
-      <br>
-      <button type="submit">保存</button>
-    </form>
-  </div>
-</div> -->
+    </div>
 
 <script>
-    window.ratingModalConfig = {
-        openRatingModalButtonId: @json($openRatingModalButtonId),
-        ratingModalId: @json($ratingModalId),
-    };
-
-    window.editModalConfig = {
-        editModalId: @json($editModalId),
-        openEditButtonClass: @json($openEditButtonClass),
-        closeEditModalButtonId: @json($closeEditModalButtonId),
-        editModalCommentId:@json($editModalCommentId),
-        editModalMessageId:@json($editModalMessageId),
-        prefixPublishedTransactionCommentId:@json($prefixPublishedTransactionCommentId),
-    };
     
     window.previewConfig = {
-        csrfToken:@json($csrfToken),
-        previewImageInputId: @json($previewImageInputId),
-        previewGridId:@json($previewGridId),
-        previewRemoveButtonClass:@json($previewRemoveButtonClass),
-        previewCellClass:@json($previewCellClass),
-        previewGridClass:@json($previewGridClass),
-        previewCommentSendButtonId:@json($previewCommentSendButtonId),
+        phpIniArgumentNames:@json($phpIniArgumentNames),
+        phpIniSettingSizesInBytes:@json($phpIniSettingSizesInBytes),
         previewPostTypes:@json($previewPostTypes),
+        userKinds:@json($userKinds),
+        transactionCommentStatuses:@json($transactionCommentStatuses),
+        csrfToken:@json($csrfToken),
+        dataFieldArgument:@json($dataFieldArgument),
+        dataIdArgument:@json($dataIdArgument),
+        routeLogin:@json($routeLogin),
+        routeItemDealItemId:@json($routeItemDealItemId),
+        routeTransactionSend:@json($routeTransactionSend),
         selectedItemId:@json($selectedItemId),
-        routeTransactionCommentUpdateItemId:@json($routeTransactionCommentUpdateItemId),
-        transactionCommentName:@json($transactionCommentName),
+        postedUserDTO:@json($postedUserDTO),
+        counterpartUserDTO:@json($counterpartUserDTO),
+        selectedItemSellerId:@json($selectedItemSellerId),
+        selectedItemBuyerId:@json($selectedItemBuyerId),
+        transactionCellContainerId:@json($transactionCellContainerId),
+        transactionCellContainerClass:@json($transactionCellContainerClass),
+        transactionCellId:@json($transactionCellId),
+        transactionCellClass:@json($transactionCellClass),
+        transactionErrorMessageId:@json($transactionErrorMessageId),
+        transactionErrorMessageClass:@json($transactionErrorMessageClass),
+        transactionCommentCellIdPrefix:@json($transactionCommentCellIdPrefix),
+        transactionCommentCellClass:@json($transactionCommentCellClass),
+        transactionCommentPreviewContainerIdPrefix:@json($transactionCommentPreviewContainerIdPrefix),
+        transactionCommentPreviewContainerClass:@json($transactionCommentPreviewContainerClass),
+        transactionCommentPreviewIdPrefix:@json($transactionCommentPreviewIdPrefix),
+        transactionCommentPreviewClass:@json($transactionCommentPreviewClass),
+        transactionCommentEditButtonContainerIdPrefix:@json($transactionCommentEditButtonContainerIdPrefix),
+        transactionCommentEditButtonContainerClass:@json($transactionCommentEditButtonContainerClass),
+        transactionCommentEditButtonIdPrefix:@json($transactionCommentEditButtonIdPrefix),
+        transactionCommentEditButtonClass:@json($transactionCommentEditButtonClass),
+        transactionCommentDeleteButtonIdPrefix:@json($transactionCommentDeleteButtonIdPrefix),
+        transactionCommentDeleteButtonClass:@json($transactionCommentDeleteButtonClass),
+        transactionCommentUploadInputIdPrefix:@json($transactionCommentUploadInputIdPrefix),
+        transactionCommentUploadInputClass:@json($transactionCommentUploadInputClass),
+        transactionCommentUploadLabelIdPrefix:@json($transactionCommentUploadLabelIdPrefix),
+        transactionCommentUploadLabelClass:@json($transactionCommentUploadLabelClass),
+        transactionCommentSendButtonIdPrefix:@json($transactionCommentSendButtonIdPrefix),
+        transactionCommentSendButtonClass:@json($transactionCommentSendButtonClass),
+        transactionCommentErrorMessageIdPrefix:@json($transactionCommentErrorMessageIdPrefix),
+        transactionCommentErrorMessageNamePrefix:@json($transactionCommentErrorMessageNamePrefix),
+        transactionCommentErrorMessageClass:@json($transactionCommentErrorMessageClass),
+        transactionCommentUserImagePreviewIdPrefix:@json($transactionCommentUserImagePreviewIdPrefix),
+        transactionCommentUserImagePreviewClass:@json($transactionCommentUserImagePreviewClass),
+        transactionCommentCommentTextareaContainerIdPrefix:@json($transactionCommentCommentTextareaContainerIdPrefix),
+        transactionCommentCommentTextareaContainerClass:@json($transactionCommentCommentTextareaContainerClass),
+        transactionCommentCommentTextareaIdPrefix:@json($transactionCommentCommentTextareaIdPrefix),
+        transactionCommentCommentTextareaClass:@json($transactionCommentCommentTextareaClass),
+        transactionCommentCommentTextareaNamePrefix:@json($transactionCommentCommentTextareaNamePrefix),
+        transactionImageCellIdPrefix:@json($transactionImageCellIdPrefix),
+        transactionImageCellClass:@json($transactionImageCellClass),
+        transactionImageRemoveButtonIdPrefix:@json($transactionImageRemoveButtonIdPrefix),
+        transactionImageRemoveButtonClass:@json($transactionImageRemoveButtonClass),
+        transactionImagePreviewContainerIdPrefix:@json($transactionImagePreviewContainerIdPrefix),
+        transactionImagePreviewContainerClass:@json($transactionImagePreviewContainerClass),
+        transactionImageImageDivIdPrefix:@json($transactionImageImageDivIdPrefix),
+        transactionImageImageDivClass:@json($transactionImageImageDivClass),
+        transactionImagePreviewIdPrefix:@json($transactionImagePreviewIdPrefix),
+        transactionImagePreviewClass:@json($transactionImagePreviewClass),
+        transactionImageErrorMessageIdPrefix:@json($transactionImageErrorMessageIdPrefix),
+        userImageCellIdPrefix:@json($userImageCellIdPrefix),
+        userImageCellClass:@json($userImageCellClass),
+        userImagePreviewContainerIdPrefix:@json($userImagePreviewContainerIdPrefix),
+        userImagePreviewContainerClass:@json($userImagePreviewContainerClass),
+        userImagePreviewIdPrefix:@json($userImagePreviewIdPrefix),
+        userImagePreviewClass:@json($userImagePreviewClass),
+        userImageImageDivIdPrefix:@json($userImageImageDivIdPrefix),
+        userImageImageDivClass:@json($userImageImageDivClass),
+        userNameDivIdPrefix:@json($userNameDivIdPrefix),
+        userNameDivClass:@json($userNameDivClass),
+        ratingModalOpenButtonId: @json($ratingModalOpenButtonId),
+        ratingModalId: @json($ratingModalId),
+        selectedItemIsBuyerCompleted:@json($selectedItemIsBuyerCompleted),
+        selectedItemIsSellerCompleted:@json($selectedItemIsSellerCompleted),
     }
 </script>
-
-<script src="{{ asset('js/rating-modal.js') }}"></script>
 <script src="{{ asset('js/transaction-comment/preview.js') }}" type="module"></script>
 
 @endsection

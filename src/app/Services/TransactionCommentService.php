@@ -7,15 +7,18 @@ use App\Models\UserItem;
 use App\Models\TransactionComment;
 use App\Constants\TransactionCommentStatus;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class TransactionCommentService{
 
 
-    public static function getUserItemIdForBothUsersFromUserIdAndItemId(
-        $userId,
-        $itemId
+    public static function getPurchasedUserItemIdFromItemIdAndUserId(
+        $itemId,
+        $userId
     ){
         $item = Item::find($itemId);
+
         $buyerId = null;
         $sellerId = null;
         if($item){
@@ -49,45 +52,37 @@ class TransactionCommentService{
                 })
                 ->where('type', 'purchase')
                 ->first();
-        }//
+        }
 
         $userItemId = $userItem ? $userItem->id : null;
 
         return($userItemId);
     }
 
-    public static function getDraftTransactionCommentFromUserIdAndItemId(
-        $userId,
-        $itemId
-    ) {
-        $userItemId = self::getUserItemIdForBothUsersFromUserIdAndItemId(
-            $userId,
-            $itemId
-        );
-
+    public static function getDraftTransactionCommentFromUserItemIdAndUserId(
+        $userItemId,
+        $userId = null,
+    ){
         $userItem = UserItem::find($userItemId);
 
         $draftTransactionComment = null;
         if($userItem){
-            $draftTransactionComment = $userItem->transactionComments()
-                                ->where('user_id', $userId)
-                                ->where('status', TransactionCommentStatus::DRAFT)
-                                ->orderBy('created_at', 'asc')
-                                ->first();
+            $query = $userItem->transactionComments();
+            if($userId){
+                $query = $query->where('user_id', $userId);
+            }
+            $draftTransactionComment =
+                $query->where('status', TransactionCommentStatus::DRAFT)
+                    ->orderBy('created_at', 'asc')
+                    ->first();
         }//$userItem
 
         return $draftTransactionComment;
     }
-    
-    public static function getPublishedTransactionCommentsFromUserIdAndItemId(
-        $userId,
-        $itemId
-    ) {
-        $userItemId = self::getUserItemIdForBothUsersFromUserIdAndItemId(
-            $userId,
-            $itemId
-        );
 
+    public static function getPublishedTransactionCommentsFromUserItemId(
+        $userItemId
+    ){
         $userItem = UserItem::find($userItemId);
 
         $publishedTransactionComments = null;
@@ -97,9 +92,62 @@ class TransactionCommentService{
                                 ->orderBy('created_at', 'asc')
                                 ->get();
         }//$userItem
+        return($publishedTransactionComments);
+    }//getPublishedTransactionCommentsFromUserItemId
+
+    public static function getDraftTransactionCommentFromItemIdAndUserId(
+        $itemId,
+        $userId
+    ) {
+        $userItemId = self::getPurchasedUserItemIdFromItemIdAndUserId(
+            $itemId,
+            $userId
+        );
+
+        $draftTransactionComment = self::getDraftTransactionCommentFromUserItemIdAndUserId(
+            $userItemId,
+            $userId,
+        );
+        
+        return($draftTransactionComment);
+    }
+    
+    public static function getPublishedTransactionCommentsFromItemIdAndUserId(
+        $itemId,
+        $userId
+    ) {
+        $userItemId = self::getPurchasedUserItemIdFromItemIdAndUserId(
+            $itemId,
+            $userId
+        );
+
+        $publishedTransactionComments = self::getPublishedTransactionCommentsFromUserItemId(
+            $userItemId
+        );
 
         return $publishedTransactionComments;
     }
 
-    
+    public static function getCurrentTransactionCommentsFromUserItemIdAndUserId(
+        $userItemId,
+        $userId = null
+    ){
+
+        $currentTransactionComments = TransactionComment::where(function ($query) use ($userItemId){
+                $query->where('status', TransactionCommentStatus::PUBLISHED)
+                    ->where('user_item_id', $userItemId);
+            })
+            ->orWhere(function ($query) use ($userItemId,$userId) {
+                $query->where('status', TransactionCommentStatus::DRAFT)
+                    ->where('user_item_id', $userItemId)
+                    ->where('user_id', $userId);
+            })
+            ->orderByRaw('CASE WHEN status = ? THEN 1 ELSE 2 END', [TransactionCommentStatus::PUBLISHED])
+            ->orderBy('created_at', 'asc')
+            ->orderBy('id', 'asc')
+            ->get();
+
+        return $currentTransactionComments;
+
+    }//getCurrentTransactionCommentsFromUserItemIdAndUserId    
 }

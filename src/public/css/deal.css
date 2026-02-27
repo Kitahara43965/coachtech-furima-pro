@@ -1,11 +1,72 @@
 .deal-board {
     width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    min-height: 100vh;
+}
+
+.deal-other-items {
+    padding: 0px;
+    width: 20%;
+    background-color: gray;
+    text-align: center;
+}
+
+.deal-other-items-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+}
+
+.deal-other-items-button-container {
+    display: flex;
+    justify-content: center;
+    position: relative;
+}
+
+.deal-other-items-button {
+    color: black;
+    background-color: lightgray;
+    width: 100px;
+    font-size: 12px;
+    margin: 5px 0;
+    text-decoration: none;
+    border-radius: 3px;
+}
+
+.deal-other-items-notified-transaction-comment-number {
+    position: absolute; /* 絶対配置 */
+    top: 2px;
+    left: 6px; /* 左から4px */
+    background-color: rgba(255, 0, 0); /* 背景色を赤に */
+    color: white; /* テキストの色を白に */
+    padding: 3px; /* パディングを調整（小さくする） */
+    font-size: 7px; /* フォントサイズを半分に */
+    border-radius: 50%; /* 角を完全に丸くする */
+    width: 15px; /* 横幅を設定（円の大きさ） */
+    height: 15px; /* 高さを設定（円の大きさ） */
+    display: flex; /* 中央揃えのため */
+    justify-content: center; /* 横方向で中央揃え */
+    align-items: center; /* 縦方向で中央揃え */
+}
+
+.deal-transaction-cell-container {
+    width: 80%;
+}
+
+.user-image-and-rating-modal-open-button-container {
+    margin: 10px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .deal-title-user-image-and-name {
     display: flex;
     justify-content: start;
     text-align: left;
+    align-items: center;
 }
 
 .deal-title-user-image-container {
@@ -41,6 +102,8 @@
 .deal-title-user-name {
     align-items: center;
     margin: 0px;
+    font-size: 20px;
+    font-weight: bold;
 }
 
 .deal-left-user-image-and-name {
@@ -76,6 +139,32 @@
 .deal-user-name {
     align-items: center;
     margin: 20px;
+}
+
+.deal-horizontal-line {
+    border-top: 2px solid black;
+    width: 100%;
+    margin: 5px 0;
+}
+
+.deal-title-item-image {
+    display: flex;
+    justify-content: start;
+    text-align: left;
+}
+
+.deal-title-item-name {
+    align-items: center;
+    margin: 15px 0;
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.deal-title-item-price {
+    align-items: center;
+    margin: 15px 0;
+    font-size: 20px;
+    font-weight: normal;
 }
 
 .deal-left-published-textarea-container {

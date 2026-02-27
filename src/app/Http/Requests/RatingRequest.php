@@ -14,17 +14,16 @@ class RatingRequest extends FormRequest
     public function rules()
     {
         return [
-            'rating_value' => ['required','integer','min:1','max:5'],
+            'rating_value' => ['integer','min:0','max:5'],
         ];
     }
 
     public function messages()
     {
         return [
-            'rating_value.required' => '評価して下さい。',
             'rating_value.integer' => '整数値を入力して下さい。',
-            'rating_value.min' => '評価は星1から5個までで評価してください。',
-            'rating_value.max' => '評価は星1から5個までで評価してください。',
+            'rating_value.min' => '評価は星0から5個までで評価してください。',
+            'rating_value.max' => '評価は星0から5個までで評価してください。',
         ];
     }
 }

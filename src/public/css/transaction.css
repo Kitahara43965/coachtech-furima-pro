@@ -1,0 +1,156 @@
+.transaction-cell {
+    padding: 10px;
+}
+
+.transaction-cell-container {
+    padding: 0px;
+}
+
+.transaction-comment-edit-button-container {
+    display: flex;
+}
+
+.transaction-comment-edit-button,
+.transaction-comment-delete-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: gray;
+}
+
+.transaction-error-message {
+    color: red;
+}
+
+.transaction-comment-cell {
+    flex-direction: column;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-end;
+}
+
+.transaction-comment-upload-input {
+    display: none;
+}
+
+.transaction-comment-upload-label {
+    width: fit-content;
+    height: fit-content;
+    padding: 8px 14px;
+    border: 1px solid red;
+    border-radius: 5px;
+    background: #fff;
+    color: red;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 14px;
+    text-align: center;
+    text-decoration: none;
+}
+
+.transaction-comment-send-button {
+    display: inline-block;
+}
+
+.transaction-comment-preview-container {
+    margin: 0;
+}
+
+.transaction-comment-preview {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.transaction-comment-comment-textarea-container {
+    margin: 10px 0;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.transaction-comment-comment-textarea {
+    margin: 0 10px;
+}
+
+.transaction-comment-error-message {
+    color: red;
+}
+
+.transaction-comment-send-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: blue;
+}
+
+.transaction-comment-upload-button {
+    padding: 0;
+}
+
+.transaction-comment-user-image-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.transaction-image-cell {
+    width: auto; /* 親要素の幅を100%に設定 */
+    max-width: none; /* 最大幅の制限を解除 */
+}
+
+.transaction-image-preview-container {
+    width: 100px;
+    position: relative;
+}
+
+.transaction-image-preview {
+    width: 100px;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.transaction-image-image-div {
+    display: none;
+}
+
+.transaction-image-remove-button {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 22px;
+    height: 22px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    font-size: 16px;
+    line-height: 22px;
+    cursor: pointer;
+}
+
+.transaction-image-remove-button:hover {
+    background: rgba(255, 0, 0, 0.8);
+}
+
+.user-image-cell {
+    padding: 0;
+}
+.user-image-preview-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin: 10px 0;
+}
+.user-image-preview {
+    width: 80px;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 50%;
+}
+.user-name-div {
+    padding: 0;
+    margin: 10px;
+}
+
+.user-image-image-div {
+    display: none;
+}

@@ -77,6 +77,11 @@
         $newImageName = null;
         $newPreviewUrl = null;
     }//$authUserImageName
+
+    $maxShownItemNumber = 0;
+    if($shownItems && !$shownItems->isEmpty()){
+        $maxShownItemNumber = $shownItems->count();
+    }
 @endphp
 
     <div class="index-board">
@@ -107,7 +112,7 @@
                         <div class="index-user-name">
                             {{$authUser?->username}}
                         </div>
-                        @if($authUserMaxRatingNumber >= 1)
+                        @if($postedUserMaxRatingNumber >= 1)
                             <div class="rating disabled">
                                 @for ($i = 5; $i >= 1; $i--)
                                     <input 
@@ -115,7 +120,7 @@
                                         id="star{{ $i }}" 
                                         name="rating_value" 
                                         value="{{ $i }}"
-                                        {{ $authUserRoundedRatingValue == $i ? 'checked' : '' }}
+                                        {{ $postedUserRoundedRatingValue == $i ? 'checked' : '' }}
                                     >
                                     <label for="star{{ $i }}">★</label>
                                 @endfor
@@ -139,6 +144,9 @@
                     <a class="{{$dealGoodsIndexToggleClass}}" href="{{ route('mypage', ['page' => 'deal']) }}">
                         取引中の商品
                     </a>
+                    @if($maxNotifiedItemNumber >= 1)
+                        <div class="index-max-notified-item-number ">{{$maxNotifiedItemNumber}}</div>
+                    @endif
                 </div>
             </div>
         @endif
@@ -147,49 +155,60 @@
 
 
         <div class="index-item-card-container">
-            @if($shownItems)
-                @foreach($shownItems as $shownItem)
-                    @php
-                        $candidateNewImageName = $shownItem->image;
-                        if($candidateNewImageName){
-                            $newImageName = $candidateNewImageName;
-                            if($shownItem->is_default){
-                                $newPreviewUrl = asset('storage/'.$coachtechImageDirectory.'/'.$newImageName);
-                            }else{
-                                $newPreviewUrl = asset('storage/'.$itemImageDirectory.'/'.$newImageName);
-                            }
-                        }else{//$candidateNewImageName
-                            $newPreviewUrl = null;
-                            $newImageName = null;
-                        }//$candidateNewImageName
+            @for($shownItemNumber = 1;$shownItemNumber <= $maxShownItemNumber; $shownItemNumber++)
+                @php
+                    $shownItem = $shownItems->get($shownItemNumber - 1);
+                    $maxNotifiedTransactionCommentNumber = 0;
+                    if($showFunctionKind === ShowFunctionKind::DEAL_GOODS_MYPAGE){
+                        $maxNotifiedTransactionCommentNumber
+                            = $maxNotifiedTransactionCommentNumbers[$shownItemNumber - 1];
+                    }
+                    $candidateNewImageName = $shownItem->image;
+                    if($candidateNewImageName){
+                        $newImageName = $candidateNewImageName;
+                        if($shownItem->is_default){
+                            $newPreviewUrl = asset('storage/'.$coachtechImageDirectory.'/'.$newImageName);
+                        }else{
+                            $newPreviewUrl = asset('storage/'.$itemImageDirectory.'/'.$newImageName);
+                        }
+                    }else{//$candidateNewImageName
+                        $newPreviewUrl = null;
+                        $newImageName = null;
+                    }//$candidateNewImageName
 
-                        $isPurchased = $shownItem->isPurchased();
+                    $isPurchased = $shownItem->isPurchased();
 
-                    @endphp
+                @endphp
 
-                        @if($hrefShownItemKind === $evaluationHrefShownItemKind)
-                            <a href="{{ route('item.itemId', ['item_id' => $shownItem->id]) }}" class="index-item-card">
-                        @elseif($hrefShownItemKind === $dealHrefShownItemKind)
-                            <a href="{{ route('item.deal.itemId', ['item_id' => $shownItem->id]) }}" class="index-item-card">
-                        @else
-                            <a href="{{ route('item.itemId', ['item_id' => $shownItem->id]) }}" class="index-item-card">
-                        @endif
+                    @if($hrefShownItemKind === $evaluationHrefShownItemKind)
+                        <a href="{{ route('item.itemId', ['item_id' => $shownItem->id]) }}" class="index-item-card">
+                    @elseif($hrefShownItemKind === $dealHrefShownItemKind)
+                        <a href="{{ route('item.deal.itemId', ['item_id' => $shownItem->id]) }}" class="index-item-card">
+                    @else
+                        <a href="{{ route('item.itemId', ['item_id' => $shownItem->id]) }}" class="index-item-card">
+                    @endif
 
-                    
-                        <div class="index-image-container">
-                            <div class="index-item-image-container ">
-                                <img src="{{ $newPreviewUrl }}" class="index-item-image">
-                            </div>
-                            @if($isPurchased)
-                                <div class="index-sold-text">Sold</div>
+                
+                    <div class="index-image-container">
+                        <div class="index-item-image-container ">
+                            @if($showFunctionKind === ShowFunctionKind::DEAL_GOODS_MYPAGE)
+                                @if($maxNotifiedTransactionCommentNumber >= 1)
+                                    <div class = "index-item-image-notified-transaction-comment-number">
+                                        {{$maxNotifiedTransactionCommentNumber}}
+                                    </div>
+                                @endif
                             @endif
+                            <img src="{{ $newPreviewUrl }}" class="index-item-image">
                         </div>
-                        <div class="index-item-card-footer">
-                            <span class="index-item-name">{{ $shownItem->name }}</span>
-                        </div>
-                    </a>
-                @endforeach
-            @endif
+                        @if($isPurchased)
+                            <div class="index-sold-text">Sold</div>
+                        @endif
+                    </div>
+                    <div class="index-item-card-footer">
+                        <span class="index-item-name">{{ $shownItem->name }}</span>
+                    </div>
+                </a>
+            @endfor
         </div>
     </div>
 

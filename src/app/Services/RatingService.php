@@ -10,7 +10,7 @@ use App\DTOs\RatingDTO;
 use App\Constants\RatingType;
 
 class RatingService{
-    public static function getRatingDTOFromUserIdAndItemId($fromUserId,$itemId){
+    public static function getRatingDTOFromItemIdAndUserId($itemId,$fromUserId){
 
         $item = Item::find($itemId);
         $itemBuyer = null;

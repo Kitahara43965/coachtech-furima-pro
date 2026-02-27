@@ -11,10 +11,11 @@ class CreateTransactionCommentsTable extends Migration
     {
         Schema::create('transaction_comments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_item_id')->constrained('user_item')->cascadeOnDelete(); // 取引ID
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();          // コメントした人
-            $table->text('comment')->nullable();
+            $table->foreignId('user_item_id')->constrained('user_item')->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->text("comment")->nullable();
             $table->string('status')->default(TransactionCommentStatus::DRAFT);
+            $table->boolean('is_watched')->default(false);
             $table->timestamps();
         });
     }

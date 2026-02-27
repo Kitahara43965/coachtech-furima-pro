@@ -9,4 +9,4 @@ class RatingDTO{
     public ?int $to_user_id = null;
     public ?int $item_id = null;
     public ?string $type = null;
-}//Message
+}//RatingDTO

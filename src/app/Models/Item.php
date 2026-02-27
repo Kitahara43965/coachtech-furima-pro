@@ -47,6 +47,8 @@ class Item extends Model
         return false;
     }
 
+    
+
     public function isOwnedBy(?User $user): bool
     {
         if (!$user) {
@@ -148,6 +150,11 @@ class Item extends Model
         return $this->purchasedByUsers()
             ->whereIn('user_item.status', ['trading', 'completed'])
             ->first();
+    }
+
+    public function transactionComments()
+    {
+        return $this->hasMany(TransactionComment::class, 'user_item_id');
     }
 
 }

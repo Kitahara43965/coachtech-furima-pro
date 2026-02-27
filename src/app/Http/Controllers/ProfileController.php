@@ -7,21 +7,20 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\ProfileRequest;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Controllers\BaseController;
+use App\Services\ImageFileNumberCountService;
+use App\Constants\Files\FileName;
 
 class ProfileController
 {
     
     public function countImages()
     {
-        $baseController = new BaseController();
-        $count = $baseController->getPublicImageNumber(BaseController::USER_IMAGE_DIRECTORY,BaseController::USER_IMAGE_PREFIX);
+        $count = ImageFileNumberCountService::getPublicImageNumber(FileName::USER_IMAGE_DIRECTORY,FileName::USER_IMAGE_PREFIX);
         return response()->json(['count' => $count]);
     }
 
     public function mypageProfileUpdate(ProfileRequest $request)
     {
-        $baseController = new BaseController();
         $authenticatedUser = Auth::user();
         $previewUrl = null;
         $imageName = null;
@@ -31,11 +30,11 @@ class ProfileController
             $originalImageName = $file->getClientOriginalName();
             $extension = pathinfo($originalImageName, PATHINFO_EXTENSION);
 
-            $count = $baseController->getPublicImageNumber(BaseController::USER_IMAGE_DIRECTORY,BaseController::USER_IMAGE_PREFIX);
-            $imageName = BaseController::USER_IMAGE_PREFIX . ($count + 1) . '.' . $extension;
+            $count = ImageFileNumberCountService::getPublicImageNumber(FileName::USER_IMAGE_DIRECTORY,FileName::USER_IMAGE_PREFIX);
+            $imageName = FileName::USER_IMAGE_PREFIX . ($count + 1) . '.' . $extension;
 
             // 保存
-            $path = $file->storeAs(BaseController::USER_IMAGE_DIRECTORY, $imageName, 'public');
+            $path = $file->storeAs(FileName::USER_IMAGE_DIRECTORY, $imageName, 'public');
             $previewUrl = asset('storage/'.$path);
         } else {
             $imageName = $request->input('image_name');

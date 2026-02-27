@@ -9,19 +9,30 @@ use App\Models\Condition;
 use App\Models\PurchaseMethod;
 use App\Models\Rating;
 use App\Models\User;
+use App\Models\UserItem;
 use App\Http\Requests\ExhibitionRequest;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\BaseController;
 use Illuminate\Support\Facades\DB;
+use App\Constants\Files\FileName;
 use App\Constants\ShowFunctionKinds\OriginalShowFunctionKind;
 use App\Constants\ShowFunctionKinds\ShowFunctionKind;
 use App\Constants\ShownItemsKind;
 use App\Constants\PreviewErrorStatus;
 use App\Constants\PreviewPostType;
+use App\Constants\UserKind;
 use App\Constants\TransactionCommentStatus;
+use App\Constants\NamePrefix;
 use App\Services\ShownItemsService;
 use App\Services\RatingService;
 use App\Services\TransactionCommentService;
+use App\Services\TransactionCommentDTOService;
+use App\Constants\Files\PhpIniArgumentName;
+use App\Services\Settings\PhpIniService;
+use App\Services\NotifiedTransactionCommentService;
+use App\Services\FileService;
+use App\Services\UserDTOService;
+use App\Services\TradingItemsService;
+
 
 class ShowController extends Controller
 {
@@ -34,7 +45,7 @@ class ShowController extends Controller
         }else if($originalShowFunctionKind === OriginalShowFunctionKind::SHOW_EMAIL_VERIFICATION){
             $showFunctionKind = ShowFunctionKind::SHOW_EMAIL_VERIFICATION;
         }else if($originalShowFunctionKind === OriginalShowFunctionKind::INDEX){
-            $mode = $request->query('tab', 'index');
+            $mode = $request->query('tab', null);
             if($mode == 'index'){
                 $showFunctionKind = ShowFunctionKind::INDEX_INDEX;
             }else if($mode == 'mylist'){
@@ -43,7 +54,7 @@ class ShowController extends Controller
                 $showFunctionKind = ShowFunctionKind::INDEX_INDEX;
             }//$mode
         }else if($originalShowFunctionKind === OriginalShowFunctionKind::MYPAGE){
-            $mode = $request->query('page', 'sell');
+            $mode = $request->query('page', null);
             if($mode === 'sell'){
                 $showFunctionKind = ShowFunctionKind::SOLD_GOODS_MYPAGE;
             }else if($mode === 'buy'){
@@ -110,7 +121,7 @@ class ShowController extends Controller
         }else if($showFunctionKind === ShowFunctionKind::DEAL_GOODS_MYPAGE){
             $returnedViewFile = 'index';
             $selectedItemMakeMarker = 0;
-            $isMultipleFunctionHeader = true;
+            $isMultipleFunctionHeader = false;
             $shownItemsKind = ShownItemsKind::DEAL_GOODS;
         }else if($showFunctionKind === ShowFunctionKind::SELL){
             $returnedViewFile = 'sell';
@@ -175,10 +186,8 @@ class ShowController extends Controller
         $showFunctionKind = self::getShowFunctionKind($request,$originalShowFunctionKind);
 
         $csrfToken = csrf_token();
-        $openRatingModalButtonId = "open-rating-modal-button-id";
+        $ratingModalOpenButtonId = "rating-modal-open-button-id";
         $ratingModalId = "rating-modal-id";
-        $ratingModalClass = "rating-modal";
-        $ratingModalContentClass = "rating-modal-content";
 
         $editModalId = "edit-modal-id";
         $editModalClass = "edit-modal";
@@ -189,36 +198,99 @@ class ShowController extends Controller
         $editModalMessageId = "edit-modal-message-id";
         $prefixPublishedTransactionCommentId = "comment-";
 
-        $previewImageInputId = "preview-image-input-id";
-        $previewGridId = "preview-grid-id";
-        $previewRemoveButtonClass = "preview-remove-button";
-        $previewCellClass = "preview-cell";
-        $previewGridClass = "preview-grid";
-        $previewCommentSendButtonId = "preview-comment-send-button-id";
-
-        $previewPostTypes = PreviewPostType::toArray();
-        $transactionCommentName = PreviewErrorStatus::TRANSACTION_COMMENT_NAME;
-
-        $coachtechImageDirectory = BaseController::COACHTECH_IMAGE_DIRECTORY;
-        $itemImageDirectory = BaseController::ITEM_IMAGE_DIRECTORY;
-        $itemImagePrefix = BaseController::ITEM_IMAGE_PREFIX;
-        $userImageDirectory = BaseController::USER_IMAGE_DIRECTORY;
-        $defaultProfileImageDirectory = BaseController::DEFAULT_PROFILE_IMAGE_DIRECTORY;
-        $defaultProfileImageName = BaseController::DEFAULT_PROFILE_IMAGE_NAME;
-        $trashImageDirectory = BaseController::TRASH_IMAGE_DIRECTORY;
-        $trashImageName = BaseController::TRASH_IMAGE_NAME;
-        $userImagePrefix = BaseController::USER_IMAGE_PREFIX;
-
         $customSelectId = "custom-select-id";
 
+        $dataFieldArgument = "data-field";
+        $dataIdArgument = "data-id";
+        $transactionCellContainerId = "transaction-cell-container-id";
+        $transactionCellContainerClass = "transaction-cell-container";
+        $transactionCellId = "transaction-cell-id";
+        $transactionCellClass = "transaction-cell";
+        $transactionErrorMessageId = "transaction-error-message-id";
+        $transactionErrorMessageClass = "transaction-error-message";
+        $transactionCommentCellIdPrefix = "transaction-comment-cell-id-";
+        $transactionCommentCellClass = "transaction-comment-cell";
+        $transactionCommentPreviewContainerIdPrefix = "transaction-comment-preview-container-id-";
+        $transactionCommentPreviewContainerClass = "transaction-comment-preview-container";
+        $transactionCommentPreviewIdPrefix = "transaction-comment-preview-id-";
+        $transactionCommentPreviewClass = "transaction-comment-preview";
+        $transactionCommentEditButtonContainerIdPrefix = "transaction-comment-edit-button-container-id-";
+        $transactionCommentEditButtonContainerClass = "transaction-comment-edit-button-container";
+        $transactionCommentEditButtonIdPrefix = "transaction-comment-edit-button-id-";
+        $transactionCommentEditButtonClass = "transaction-comment-edit-button";
+        $transactionCommentDeleteButtonIdPrefix = "transaction-comment-delete-button-id-";
+        $transactionCommentDeleteButtonClass = "transaction-comment-delete-button";
+        $transactionCommentUploadInputIdPrefix = "transaction-comment-upload-input-id-";
+        $transactionCommentUploadInputClass = "transaction-comment-upload-input";
+        $transactionCommentUploadLabelIdPrefix = "transaction-comment-upload-label-id-";
+        $transactionCommentUploadLabelClass = "transaction-comment-upload-label";
+        $transactionCommentSendButtonIdPrefix = "transaction-comment-send-button-id-";
+        $transactionCommentSendButtonClass = "transaction-comment-send-button";
+        $transactionCommentErrorMessageIdPrefix = "transaction-comment-error-message-id-";
+        $transactionCommentErrorMessageClass = "transaction-comment-error-message";
+        $transactionCommentErrorMessageNamePrefix = NamePrefix::TRANSACTION_COMMENT_ERROR_MESSAGE;
+        $transactionCommentUserImagePreviewIdPrefix = "transaction-comment-user-image-container-id-";
+        $transactionCommentUserImagePreviewClass = "transaction-comment-user-image-container";
+        $transactionCommentCommentTextareaContainerIdPrefix = "transaction-comment-comment-textarea-container-id-";
+        $transactionCommentCommentTextareaContainerClass = "transaction-comment-comment-textarea-container";
+        $transactionCommentCommentTextareaIdPrefix = "transaction-comment-comment-textarea-id-";
+        $transactionCommentCommentTextareaClass = "transaction-comment-comment-textarea";
+        $transactionCommentCommentTextareaNamePrefix = NamePrefix::TRANSACTION_COMMENT_COMMENT_TEXTAREA;
+        $transactionImageCellIdPrefix = "transaction-image-cell-id-";
+        $transactionImageCellClass = "transaction-image-cell";
+        $transactionImageRemoveButtonIdPrefix = "transaction-image-remove-button-id-";
+        $transactionImageRemoveButtonClass = "transaction-image-remove-button";
+        $transactionImagePreviewContainerIdPrefix = "transaction-image-preview-container-id-";
+        $transactionImagePreviewContainerClass = "transaction-image-preview-container";
+        $transactionImagePreviewIdPrefix = "transaction-image-preview-id-";
+        $transactionImagePreviewClass = "transaction-image-preview";
+        $transactionImageImageDivIdPrefix = "transaction-image-image-div-id-";
+        $transactionImageImageDivClass = "transaction-image-image-div";
+        $transactionImageErrorMessageIdPrefix = "transaction-image-error-message-id-";
+
+        $userImageCellIdPrefix = "user-image-cell-id-";
+        $userImageCellClass = "user-image-cell";
+        $userImagePreviewContainerIdPrefix = "user-image-preview-container-id-";
+        $userImagePreviewContainerClass = "user-image-preview-container";
+        $userImagePreviewIdPrefix = "user-image-preview-id-";
+        $userImagePreviewClass = "user-image-preview";
+        $userImageImageDivIdPrefix = "user-image-image-div-id-";
+        $userImageImageDivClass = "user-image-image-div";
+        $userNameDivIdPrefix = "user-name-div-id-";
+        $userNameDivClass = "user-name-div";
+
+        $previewPostTypes = PreviewPostType::toArray();
+        $userKinds = UserKind::toArray();
+        $transactionCommentStatuses = TransactionCommentStatus::toArray();
+
+        $phpIniArgumentNames = PhpIniArgumentName::toArray();
+        $phpIniSettingSizesInBytes = PhpIniService::getPhpIniSettingSizesInBytes();
+
+        $coachtechImageDirectory = FileName::COACHTECH_IMAGE_DIRECTORY;
+        $itemImageDirectory = FileName::ITEM_IMAGE_DIRECTORY;
+        $itemImagePrefix = FileName::ITEM_IMAGE_PREFIX;
+        $userImageDirectory = FileName::USER_IMAGE_DIRECTORY;
+        $trashImageDirectory = FileName::TRASH_IMAGE_DIRECTORY;
+        $trashImageName = FileName::TRASH_IMAGE_NAME;
+        $userImagePrefix = FileName::USER_IMAGE_PREFIX;
+
+        $postedUser = $authUser;
+        $postedUserId = $postedUser ? $postedUser->id : null;
+
+        $routeLogin = route("login");
+        $routeTransactionSend = route("transactionSend");
+
         $routePurchaseUpdateMethodItemId = null;
-        $routeTransactionCommentUpdateItemId = null;
+        $routeItemDealItemId = null;
+
         if($itemId){
-            $routePurchaseUpdateMethodItemId = route("purchase.updateMethod.itemId", $itemId);
-            $routeTransactionCommentUpdateItemId = route("transactionCommentUpdate.itemId",$itemId);
+            $routePurchaseUpdateMethodItemId = route("purchase.updateMethod.itemId", ['item_id'=>$itemId]);
+            $routeItemDealItemId = route("item.deal.itemId",['item_id'=>$itemId]);
         }//$itemId
-        
-        $defaultProfilePreviewUrl = asset('storage/'.$defaultProfileImageDirectory.'/'.$defaultProfileImageName);
+
+
+        $defaultProfileImageNamePath = FileService::getDefaultProfileImageNamePath();
+        $defaultProfilePreviewUrl = asset('storage/'.$defaultProfileImageNamePath);
         $trashPreviewUrl = asset('storage/'.$trashImageDirectory.'/'.$trashImageName);
 
         if($authUser){
@@ -254,6 +326,25 @@ class ShowController extends Controller
 
         $shownItems = ShownItemsService::getShownItems($authUser,$keyword,$shownItemsKind);
 
+        $tradingItems = TradingItemsService::getTradingItemsCollectionFromUserIdAndKeyword(
+            $postedUserId,
+            $keyword)
+        ;
+
+        $notifiedProperties = NotifiedTransactionCommentService::
+            getNotifiedPropertiesFromItemsAndUserId(
+                $tradingItems,
+                $postedUserId
+            );
+
+        $maxNotifiedItemNumber = 0;
+        $maxNotifiedTransactionCommentNumbers = null;
+        if($notifiedProperties){
+            $maxNotifiedItemNumber
+                = $notifiedProperties["maxNotifiedItemNumber"];
+            $maxNotifiedTransactionCommentNumbers
+                = $notifiedProperties["maxNotifiedTransactionCommentNumbers"];
+        }//$notifiedProperties
 
         if($selectedItemMakeMarker == 0){
             $selectedItem = null;
@@ -288,39 +379,43 @@ class ShowController extends Controller
         $isOwner = false;
         $isPurchasedBy = false;
         $selectedPurchaseMethodId = null;
+        $postedUserSelectedItemTransactionCommentDTOs = null;
         $selectedFavoritedUsers = null;
         $selectedCommentDescriptions = null;
         $selectedCategories = null;
         $selectedCondition = null;
+        $purchasedUserItemId = null;
+        $selectedItemIsBuyerCompleted = false;
+        $selectedItemIsSellerCompleted = false;
 
-        $authUserMaxRatingNumber = 0;
-        $authUserTotalRatingValue = 0;
-        $authUserRoundedRatingValue = 0;
-        if($authUser){
-            $authUserMaxRatingNumber = Rating::where('to_user_id', $authUserId)->count();
-            $authUserTotalRatingValue = Rating::where('to_user_id', $authUserId)->sum('rating_value');
-            if($authUserMaxRatingNumber <= 0){
-                $authUserRoundedRatingValue = 0;
-            }else{//$authUserMaxRatingNumber
-                $authUserRoundedRatingValue = round(((double)$authUserTotalRatingValue / (double)$authUserMaxRatingNumber));
-            }//$authUserMaxRatingNumber
+        $postedUserMaxRatingNumber = 0;
+        $postedUserTotalRatingValue = 0;
+        $postedUserRoundedRatingValue = 0;
+        if($postedUser){
+            $postedUserMaxRatingNumber = Rating::where('to_user_id', $postedUserId)->count();
+            $postedUserTotalRatingValue = Rating::where('to_user_id', $postedUserId)->sum('rating_value');
+            if($postedUserMaxRatingNumber <= 0){
+                $postedUserRoundedRatingValue = 0;
+            }else{//$postedUserMaxRatingNumber
+                $postedUserRoundedRatingValue = round(((double)$postedUserTotalRatingValue / (double)$postedUserMaxRatingNumber));
+            }//$postedUserMaxRatingNumber
         }
 
         if($selectedItem){
             $selectedItemId = $selectedItem->id;
-            $selectedItemRatingDTO = RatingService::getRatingDTOFromUserIdAndItemId(
-                $authUserId,
-                $selectedItemId
+            $selectedItemRatingDTO = RatingService::getRatingDTOFromItemIdAndUserId(
+                $selectedItemId,
+                $postedUserId
             );
 
-            $draftTransactionComment = TransactionCommentService::getDraftTransactionCommentFromUserIdAndItemId(
-                $authUserId,
-                $selectedItemId
+            $draftTransactionComment = TransactionCommentService::getDraftTransactionCommentFromItemIdAndUserId(
+                $selectedItemId,
+                $postedUserId
             );
 
-            $publishedTransactionComments = TransactionCommentService::getPublishedTransactionCommentsFromUserIdAndItemId(
-                $authUserId,
-                $selectedItemId
+            $publishedTransactionComments = TransactionCommentService::getPublishedTransactionCommentsFromItemIdAndUserId(
+                $selectedItemId,
+                $postedUserId
             );
 
             $selectedItemRatingId = $selectedItemRatingDTO->rating_id;
@@ -341,15 +436,13 @@ class ShowController extends Controller
                 $selectedItemBuyerId = $selectedItemBuyer->id;
             }//$selectedItemBuyer
 
-            if($authUserId === $selectedItemBuyerId){
+            if($postedUserId === $selectedItemBuyerId){
                 $counterpartUserId = $selectedItemSellerId;
-            }else if($authUserId === $selectedItemSellerId){
+            }else if($postedUserId === $selectedItemSellerId){
                 $counterpartUserId = $selectedItemBuyerId;
             }
 
             $counterpartUser = User::find($counterpartUserId);
-
-
 
             $selectedUserIds = $selectedItem->usersByOwnership->pluck('id')->toArray();
             $selectedCategoryIds = $selectedItem->categories->pluck('id')->toArray();
@@ -373,12 +466,27 @@ class ShowController extends Controller
                 $selectedPurchaseMethodId = optional(
                     $selectedItem->purchasedByUsers->firstWhere('id', $authUserId)
                 )->pivot->purchase_method_id ?? null;
-            }else{
-                $selectedPendingTypedPivot = null;
-                $isOwner = false;
-                $isPurchasedBy = false;
-                $selectedPurchaseMethodId = null;
-            }
+            }//$authUser
+
+            $purchasedUserItemId = TransactionCommentService::getPurchasedUserItemIdFromItemIdAndUserId(
+                $itemId,
+                $postedUserId
+            );
+
+            $purchasedUserItem = UserItem::find($purchasedUserItemId);
+
+            if($purchasedUserItem){
+                $selectedItemIsBuyerCompleted = $purchasedUserItem->is_buyer_completed;
+                $selectedItemIsSellerCompleted = $purchasedUserItem->is_seller_completed;
+            }//$purchasedUserItem
+
+            $transactionCommentDTOService = new TransactionCommentDTOService();
+
+            $postedUserSelectedItemTransactionCommentDTOs 
+                = $transactionCommentDTOService->getCurrentTransactionCommentDTOsFromItemIdAndUserId(
+                $selectedItemId,
+                $postedUserId
+            );
 
             $selectedFavoritedUsers = $selectedItem->favoritedByUsers;
             $selectedCommentDescriptions = $selectedItem->comments->pluck('description')->toArray();
@@ -387,6 +495,11 @@ class ShowController extends Controller
             $selectedItemHasBuyerRated = $selectedItem->hasBuyerRated();
 
         }
+
+        $userDTOService = new UserDTOService();
+        $postedUserDTO = $userDTOService->getUserDTOFromUserId($postedUserId);
+        $counterpartUserDTO = $userDTOService->getUserDTOFromUserId($counterpartUserId);
+
         
         if($selectedUserIds){
             if (in_array($authUserId, $selectedUserIds)) {
@@ -394,12 +507,12 @@ class ShowController extends Controller
             }
         }//$selectedUserIds
 
+        //dd($maxWatchedCounterPartTransactionCommentNumbers);
+
         return view($returnedViewFile,compact(
             "csrfToken",
-            "openRatingModalButtonId",
+            "ratingModalOpenButtonId",
             "ratingModalId",
-            "ratingModalClass",
-            "ratingModalContentClass",
 
             "editModalId",
             "editModalClass",
@@ -410,13 +523,65 @@ class ShowController extends Controller
             "editModalMessageId",
             "prefixPublishedTransactionCommentId",
 
-            'previewImageInputId',
-            'previewGridId',
-            'previewRemoveButtonClass',
-            'previewCellClass',
-            'previewGridClass',
-            'previewCommentSendButtonId',
-            'transactionCommentName',
+            'dataFieldArgument',
+            'dataIdArgument',
+
+            'transactionCellContainerId',
+            'transactionCellContainerClass',
+            'transactionCellId',
+            'transactionCellClass',
+            'transactionErrorMessageId',
+            'transactionErrorMessageClass',
+            'transactionCommentCellIdPrefix',
+            'transactionCommentCellClass',
+            'transactionCommentPreviewContainerIdPrefix',
+            'transactionCommentPreviewContainerClass',
+            'transactionCommentPreviewIdPrefix',
+            'transactionCommentPreviewClass',
+            'transactionCommentEditButtonContainerIdPrefix',
+            'transactionCommentEditButtonContainerClass',
+            'transactionCommentEditButtonIdPrefix',
+            'transactionCommentEditButtonClass',
+            'transactionCommentDeleteButtonIdPrefix',
+            'transactionCommentDeleteButtonClass',
+            'transactionCommentUploadInputIdPrefix',
+            'transactionCommentUploadInputClass',
+            'transactionCommentUploadLabelIdPrefix',
+            'transactionCommentUploadLabelClass',
+            'transactionCommentSendButtonIdPrefix',
+            'transactionCommentSendButtonClass',
+            'transactionCommentErrorMessageIdPrefix',
+            'transactionCommentErrorMessageNamePrefix',
+            'transactionCommentErrorMessageClass',
+            'transactionCommentUserImagePreviewIdPrefix',
+            'transactionCommentUserImagePreviewClass',
+            'transactionCommentCommentTextareaContainerIdPrefix',
+            'transactionCommentCommentTextareaContainerClass',
+            'transactionCommentCommentTextareaIdPrefix',
+            'transactionCommentCommentTextareaClass',
+            'transactionCommentCommentTextareaNamePrefix',
+            'transactionImageCellIdPrefix',
+            'transactionImageCellClass',
+            'transactionImageRemoveButtonIdPrefix',
+            'transactionImageRemoveButtonClass',
+            'transactionImagePreviewContainerIdPrefix',
+            'transactionImagePreviewContainerClass',
+            'transactionImagePreviewIdPrefix',
+            'transactionImagePreviewClass',
+            'transactionImageImageDivIdPrefix',
+            'transactionImageImageDivClass',
+            'transactionImageErrorMessageIdPrefix',
+
+            'userImageCellIdPrefix',
+            'userImageCellClass',
+            'userImagePreviewContainerIdPrefix',
+            'userImagePreviewContainerClass',
+            'userImagePreviewIdPrefix',
+            'userImagePreviewClass',
+            'userImageImageDivIdPrefix',
+            'userImageImageDivClass',
+            'userNameDivIdPrefix',
+            'userNameDivClass',
 
             'itemImageDirectory',
             'itemImagePrefix',
@@ -425,9 +590,15 @@ class ShowController extends Controller
             'coachtechImageDirectory',
             'categoryButtonAppendingClass',
             'routePurchaseUpdateMethodItemId',
-            'routeTransactionCommentUpdateItemId',
+            'routeLogin',
+            'routeItemDealItemId',
+            'routeTransactionSend',
             'customSelectId',
             'previewPostTypes',
+            'userKinds',
+            'transactionCommentStatuses',
+            'phpIniArgumentNames',
+            'phpIniSettingSizesInBytes',
 
             'showFunctionKind',
             'isMultipleFunctionHeader',
@@ -437,14 +608,15 @@ class ShowController extends Controller
             'authUserId',
             'authUserIdCoincidence',
             'authUserImageName',
-            'authUserMaxRatingNumber',
-            'authUserRoundedRatingValue',
             'isFilledWithProfile',
             'itemId',
             'categories',
             'conditions',
             'purchaseMethods',
             'shownItems',
+            'tradingItems',
+            'maxNotifiedItemNumber',
+            'maxNotifiedTransactionCommentNumbers',
             'selectedItem',
             'selectedItemId',
             'selectedItemRatingRatingValue',
@@ -456,16 +628,24 @@ class ShowController extends Controller
             'selectedItemBuyerName',
             'counterpartUser',
             'counterpartUserId',
+            'counterpartUserDTO',
             'selectedItemCommentNumber',
             'selectedItemHasBuyerRated',
             'selectedCategoryIds',
             'selectedConditionId',
+            'selectedItemIsBuyerCompleted',
+            'selectedItemIsSellerCompleted',
             'draftTransactionComment',
             'publishedTransactionComments',
             'isPurchased',
             'isPurchasedBy',
             'isOwner',
             'selectedPurchaseMethodId',
+            'postedUserMaxRatingNumber',
+            'postedUserRoundedRatingValue',
+            'postedUserId',
+            'postedUserDTO',
+            'postedUserSelectedItemTransactionCommentDTOs',
             'selectedPendingTypedPivot',
             'selectedFavoritedUsers',
             'selectedCommentDescriptions',

@@ -19,8 +19,8 @@ class CreateRatingsTable extends Migration
             $table->foreignId('from_user_id')->constrained('users')->cascadeOnDelete(); // 評価するユーザー
             $table->foreignId('to_user_id')->constrained('users')->cascadeOnDelete();   // 評価されるユーザー
             $table->foreignId('item_id')->constrained()->cascadeOnDelete();             // 対象の商品
-            $table->tinyInteger('rating_value');  // 1〜5
-            $table->text('comment')->nullable(); // コメント
+            $table->tinyInteger('rating_value')->default(0);
+            $table->text('comment')->nullable();
             $table->enum('type', [RatingType::BUYER_TO_SELLER, RatingType::SELLER_TO_BUYER]); // 誰から誰への評価
             $table->timestamps();
 

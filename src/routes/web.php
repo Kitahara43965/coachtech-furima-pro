@@ -15,8 +15,6 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 
-
-
 Route::get('/', [ShowController::class, 'index'])
     ->name('index');
 Route::get('/item/{item_id}',[ShowController::class, 'itemItemId'])
@@ -93,12 +91,10 @@ Route::middleware(['auth','verified','profile.complete'])->group(function () {
 
     Route::post('/rating-store/{item_id}',[RatingController::class, 'ratingStoreItemId'])
         ->name('ratingStore.itemId');
-
-    Route::post('/transaction-comment-update/{item_id}',[TransactionCommentController::class, 'transactionCommentUpdateItemId'])
-        ->name('transactionCommentUpdate.itemId');
+        
     
-    Route::post('/transaction-comment-send/{item_id}',[TransactionCommentController::class, 'transactionCommentSendItemId'])
-        ->name('transactionCommentSend.itemId');
+    Route::post('/transaction-send',[TransactionCommentController::class, 'transactionSend'])
+        ->name('transactionSend');
 
     Route::post('/comment-edit/{item_id}',[TransactionCommentController::class, 'commentEditItemId'])
         ->name('commentEditItemId');

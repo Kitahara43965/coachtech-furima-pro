@@ -32,6 +32,36 @@
     justify-content: center;
     align-items: center;
     background-color: #f9f9f9;
+    position: relative;
+}
+
+.index-max-notified-item-number {
+    background-color: red; /* 赤色の背景 */
+    color: white; /* テキストの色を白に */
+    padding: 6px; /* パディングを調整して丸くする */
+    font-size: 14px; /* フォントサイズ */
+    border-radius: 50%; /* 角を完全に丸くする */
+    width: 30px; /* 横幅を設定（円の大きさ） */
+    height: 30px; /* 高さを設定（円の大きさ） */
+    display: flex; /* 中央揃えのため */
+    justify-content: center; /* 横方向で中央揃え */
+    align-items: center; /* 縦方向で中央揃え */
+}
+
+.index-item-image-notified-transaction-comment-number {
+    position: absolute; /* 絶対配置 */
+    top: 4px; /* 上から4px */
+    left: 4px; /* 左から4px */
+    background-color: rgba(255, 0, 0); /* 背景色を追加 */
+    color: white; /* テキストの色を白に */
+    padding: 6px; /* パディングを調整して丸くする */
+    font-size: 14px; /* フォントサイズ */
+    border-radius: 50%; /* 角を完全に丸くする */
+    width: 30px; /* 横幅を設定（円の大きさ） */
+    height: 30px; /* 高さを設定（円の大きさ） */
+    display: flex; /* 中央揃えのため */
+    justify-content: center; /* 横方向で中央揃え */
+    align-items: center; /* 縦方向で中央揃え */
 }
 
 .index-item-image {

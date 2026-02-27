@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Constants\UserItemStatus;
+use Illuminate\Support\Facades\DB;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -68,28 +69,6 @@ class User extends Authenticatable implements MustVerifyEmail
             ->whereNotNull('user_item.completed_at')
             ->wherePivot('purchase_quantity', '>=', 1)
             ->withTimestamps();
-    }
-
-    public function tradingItems()
-    {
-        $tradingItemsQuery = Item::where(function ($query) {
-                $query->whereHas('purchasedByUsers', function ($q) {
-                        $q->where('users.id', $this->id)
-                        ->where('user_item.type', 'purchase')
-                        ->where('user_item.status', UserItemStatus::TRADING)
-                        ->where('user_item.purchase_quantity', '>=', 1);
-                    })
-                    ->orWhereHas('usersByOwnership', function ($q) {
-                        $q->where('users.id', $this->id);
-                    });
-            })
-            ->whereHas('purchasedByUsers', function ($q) {
-                $q->where('user_item.type', 'purchase')
-                ->where('user_item.status', UserItemStatus::TRADING)
-                ->where('user_item.purchase_quantity', '>=', 1);
-            });
-        
-        return($tradingItemsQuery);
     }
 
     public function givenRatings()
