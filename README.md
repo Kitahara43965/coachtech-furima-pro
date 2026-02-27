@@ -88,35 +88,6 @@ MM(月)/YY(年):1234<br>
 <br>
 もし、入力せずに戻る場合は「コンビニ払い」同様「←」(カーソルをおいたときは「←戻る」になる)を押すともどります。<br>
 
-
-テストについて<br>
-(ト) php コンテナ上で<br>
-$ docker-compose exec php bash<br>
-$ vendor/bin/phpunit tests/Feature/(テスト用phpファイル名)<br>
-と入力。例えば<br>
-$ vendor/bin/phpunit tests/Feature/RegisterTest.php<br>
-のように入力します<br>
-テスト用phpファイル<br>
-1. 会員登録機能 ー RegisterTest.php<br>
-2. ログイン機能 ー LoginTest.php<br>
-3. ログアウト機能 ー LogoutTest.php<br>
-4. 商品一覧取得 ー IndexTest.php<br>
-5. マイリスト 一 覧取得 ー MylistTest.php<br>
-6. 商品検索機能 ー SearchTest.php<br>
-7. 商品詳細情報取得 ー EvaluationTest.php<br>
-8. いいね機能 ー FavoriteTest.php<br>
-9. コメント送信機能 ー CommentTest.php<br>
-10. 商品購入機能 (取引開始)ー PurchaseTest.php<br>
-11. 支払い方法選択機能 ー PurchaseMethodSelectTest.php<br>
-12. 配送先変更機能 ー AddressTest.php<br>
-13. ユーザー情報取得 ー ProfileCheckTest.php<br>
-14. ユーザー情報変更 ー ProfileChangeTest.php<br>
-15. 出品商品情報登録 ー SellTest.php<br>
-16. メール認証機能 ー MailTest.php<br>
-その他<br>
-初期化・シーディング・初期の画像保存テスト—InitialValueTest.php<br>
-プロファイルの登録完了テスト ー ProfileTest.php<br>
-
 ## 使用技術(実行環境)<br>
 
 php 8.1<br>
