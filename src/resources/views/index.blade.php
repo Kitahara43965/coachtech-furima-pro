@@ -144,8 +144,8 @@
                     <a class="{{$dealGoodsIndexToggleClass}}" href="{{ route('mypage', ['page' => 'deal']) }}">
                         取引中の商品
                     </a>
-                    @if($maxNotifiedItemNumber >= 1)
-                        <div class="index-max-notified-item-number ">{{$maxNotifiedItemNumber}}</div>
+                    @if($totalNotifiedTransactionCommentNumber >= 1)
+                        <div class="index-max-notified-item-number ">{{$totalNotifiedTransactionCommentNumber}}</div>
                     @endif
                 </div>
             </div>

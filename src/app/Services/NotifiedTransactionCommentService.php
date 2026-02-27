@@ -39,7 +39,7 @@ class NotifiedTransactionCommentService{
             $maxNotifiedTransactionCommentNumbers = array_fill(0,$maxItemNumber,null);
         }//$maxItemNumber&1
 
-        $notifiedItemNumber = 0;
+        $totalNotifiedTransactionCommentNumber = 0;
 
         for($itemNumber = 1; $itemNumber<=$maxItemNumber; $itemNumber++){
             $item = $items->get($itemNumber - 1);
@@ -52,18 +52,14 @@ class NotifiedTransactionCommentService{
             if($transactionComments && !$transactionComments->isEmpty()){
                 $maxTransactionCommentNumber = $transactionComments->count();
             }//$transactionComments
-            if($maxTransactionCommentNumber >= 1){
-                $notifiedItemNumber = $notifiedItemNumber + 1;
-            }//$maxTransactionCommentNumber&1
 
             $maxNotifiedTransactionCommentNumbers[$itemNumber - 1] = $maxTransactionCommentNumber;
+            $totalNotifiedTransactionCommentNumber = $totalNotifiedTransactionCommentNumber + $maxTransactionCommentNumber;
 
         }//$itemNumber
 
-        $maxNotifiedItemNumber = $notifiedItemNumber;
-
         $notifiedProperties =[
-            "maxNotifiedItemNumber" => $maxNotifiedItemNumber,
+            "totalNotifiedTransactionCommentNumber" => $totalNotifiedTransactionCommentNumber,
             "maxNotifiedTransactionCommentNumbers" => $maxNotifiedTransactionCommentNumbers,
         ];
 

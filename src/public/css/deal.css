@@ -38,7 +38,7 @@
 .deal-other-items-notified-transaction-comment-number {
     position: absolute; /* 絶対配置 */
     top: 2px;
-    left: 6px; /* 左から4px */
+    left: 6px;
     background-color: rgba(255, 0, 0); /* 背景色を赤に */
     color: white; /* テキストの色を白に */
     padding: 3px; /* パディングを調整（小さくする） */

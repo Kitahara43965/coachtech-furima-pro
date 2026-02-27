@@ -337,11 +337,11 @@ class ShowController extends Controller
                 $postedUserId
             );
 
-        $maxNotifiedItemNumber = 0;
+        $totalNotifiedTransactionCommentNumber = 0;
         $maxNotifiedTransactionCommentNumbers = null;
         if($notifiedProperties){
-            $maxNotifiedItemNumber
-                = $notifiedProperties["maxNotifiedItemNumber"];
+            $totalNotifiedTransactionCommentNumber
+                = $notifiedProperties["totalNotifiedTransactionCommentNumber"];
             $maxNotifiedTransactionCommentNumbers
                 = $notifiedProperties["maxNotifiedTransactionCommentNumbers"];
         }//$notifiedProperties
@@ -615,7 +615,7 @@ class ShowController extends Controller
             'purchaseMethods',
             'shownItems',
             'tradingItems',
-            'maxNotifiedItemNumber',
+            'totalNotifiedTransactionCommentNumber',
             'maxNotifiedTransactionCommentNumbers',
             'selectedItem',
             'selectedItemId',
