@@ -121,7 +121,7 @@ class ShowController extends Controller
         }else if($showFunctionKind === ShowFunctionKind::DEAL_GOODS_MYPAGE){
             $returnedViewFile = 'index';
             $selectedItemMakeMarker = 0;
-            $isMultipleFunctionHeader = false;
+            $isMultipleFunctionHeader = true;
             $shownItemsKind = ShownItemsKind::DEAL_GOODS;
         }else if($showFunctionKind === ShowFunctionKind::SELL){
             $returnedViewFile = 'sell';
@@ -156,7 +156,7 @@ class ShowController extends Controller
         }else if($showFunctionKind === ShowFunctionKind::ITEM_DEAL_ITEM_ID){
             $returnedViewFile = 'deal';
             $selectedItemMakeMarker = 1;
-            $isMultipleFunctionHeader = true;
+            $isMultipleFunctionHeader = false;
             $shownItemsKind = ShownItemsKind::UNDEFINED;
         }else{//$showFunctionKind
             $returnedViewFile = 'index';
